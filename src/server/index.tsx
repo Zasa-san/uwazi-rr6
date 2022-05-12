@@ -2,7 +2,9 @@ import express from "express";
 import cors from "cors";
 import ReactDOM from "react-dom/server";
 import * as React from "react";
+import serialize from "serialize-javascript";
 import { App } from "../shared/App";
+import { fetchPopularRepos } from "../shared/api";
 
 const app = express();
 
@@ -10,15 +12,19 @@ app.use(cors());
 app.use(express.static("dist"));
 
 app.get("*", (req, res, next) => {
-  const markup = ReactDOM.renderToString(<App />);
+  fetchPopularRepos().then((data) => {
+    const markup = ReactDOM.renderToString(<App serverData={data} />);
 
-  res.send(`
+    res.send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>SSR with React Router</title>
         <script src="/bundle.js" defer></script>
         <link href="/main.css" rel="stylesheet" />
+        <script>
+          window.__INITIAL_DATA__ = ${serialize(data)}
+        </script>
       </head>
 
       <body>
@@ -26,6 +32,7 @@ app.get("*", (req, res, next) => {
       </body>
     </html>
   `);
+  });
 });
 
 const PORT = process.env.PORT || 3000;
