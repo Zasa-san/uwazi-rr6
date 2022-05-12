@@ -1,9 +1,11 @@
 import * as React from "react";
 import ReactDOM from "react-dom";
 import { App } from "../shared/App";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.hydrate(
-  //@ts-ignore
-  <App serverData={window.__INITIAL_DATA__} />,
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>,
   document.getElementById("app")
 );

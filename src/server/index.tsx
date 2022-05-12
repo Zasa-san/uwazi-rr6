@@ -3,8 +3,11 @@ import cors from "cors";
 import ReactDOM from "react-dom/server";
 import * as React from "react";
 import serialize from "serialize-javascript";
+import { matchPath } from "react-router-dom";
+import { StaticRouter } from "react-router-dom/server";
 import { App } from "../shared/App";
 import { fetchPopularRepos } from "../shared/api";
+import { routes } from "../shared/routes";
 
 const app = express();
 
@@ -12,10 +15,21 @@ app.use(cors());
 app.use(express.static("dist"));
 
 app.get("*", (req, res, next) => {
-  fetchPopularRepos().then((data) => {
-    const markup = ReactDOM.renderToString(<App serverData={data} />);
+  const activeRoute = routes.find((route) => matchPath(route.path, req.url));
 
-    res.send(`
+  fetchPopularRepos().then((data) => {
+    const markup = ReactDOM.renderToString(
+      <StaticRouter location={req.url}>
+        <App serverData={data} />
+      </StaticRouter>
+    );
+
+    const promise = activeRoute?.fetchInitialData
+      ? activeRoute.fetchInitialData()
+      : Promise.resolve();
+
+    promise.then((data) =>
+      res.send(`
     <!DOCTYPE html>
     <html>
       <head>
@@ -31,7 +45,8 @@ app.get("*", (req, res, next) => {
         <div id="app">${markup}</div>
       </body>
     </html>
-  `);
+  `)
+    );
   });
 });
 
