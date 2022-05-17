@@ -2,7 +2,8 @@ import * as React from "react";
 import { Route, Routes } from "react-router-dom";
 import { routes } from "./routes";
 
-export const App = ({ serverData = null }) => (
+export const App = ({serverData} : any) => {
+  return (
   <>
     <div className="container">
       <Routes>
@@ -23,4 +24,4 @@ export const App = ({ serverData = null }) => (
       </Routes>
     </div>
   </>
-);
+);}

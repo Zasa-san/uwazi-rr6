@@ -1,5 +1,6 @@
 import * as React from "react";
 
-export const Library = ({ serverData }: { serverData: any }) => (
-  <pre>{JSON.stringify(serverData, null, 2)}</pre>
+export const Library = (data: any) =>
+(
+  <div>{JSON.stringify(data.data[0])}</div>
 );
